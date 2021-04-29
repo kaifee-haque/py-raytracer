@@ -17,26 +17,26 @@ class Material:
 
 class Light(Body):
     def __init__(self, position, color):
-        super(position)
-        self.ambient = color.ambient
-        self.diffuse = color.diffuse
-        self.specular = color.specular
+        super().__init__(position)
+        self.ambient = np.array(color.ambient)
+        self.diffuse = np.array(color.diffuse)
+        self.specular = np.array(color.specular)
 
 class Sphere(Body):
     def __init__(self, position, radius, color, material):
-        super(position)
+        super().__init__(position)
         self.radius = radius
 
-        self.ambient = color.ambient
-        self.diffuse = color.diffuse
-        self.specular = color.specular
+        self.ambient = np.array(color.ambient)
+        self.diffuse = np.array(color.diffuse)
+        self.specular = np.array(color.specular)
 
         self.luster = material.luster
         self.reflectivity = material.reflectivity
     
     def intersect(self, origin, direction):
-        b = 2 * np.dot(direction, origin - self.radius)
-        c = np.linalg.norm(origin - self.radius) ** 2 - radius ** 2
+        b = 2 * np.dot(direction, origin - self.position)
+        c = np.linalg.norm(origin - self.position) ** 2 - self.radius ** 2
         discriminant = b ** 2 - 4 * c
 
         if discriminant > 0:
