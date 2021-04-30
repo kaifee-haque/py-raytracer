@@ -19,8 +19,8 @@ def nearest_intersection(objects, origin, direction):
             nearest_object = objects[i]
     return nearest_object, minimum_distance
 
-def raytrace(x, y, camera, reflection_depth, objects, light):
-    pixel = np.array([x, y, 0])
+def raytrace(x, y, camera, screen, reflection_depth, objects, light):
+    pixel = np.array([x, y, screen])
     origin = camera.position
     direction = unit(pixel - origin)
 
