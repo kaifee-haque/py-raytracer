@@ -15,12 +15,12 @@ screen = {
 
 # scene setup
 camera = Body([0, 0, 1])
-light = Light((5, 5, 5), white)
+light = Light((3, 8, 6), white)
 objects = [
     Sphere((-0.5, 0.1, 0.5), 0.17, purple, shiny),
-    Sphere((0, 0, -1.1), 1, cyan, shiny),
+    Sphere((0, 0.01, -1.1), 1, cyan, shiny),
     Sphere((0.3, 0.01, 0.35), 0.2, green, shiny),
-    #Plane((0.3, -1, -0.2), orange, shiny)
+    Plane((0.3, -1.5, -0.2), orange, shiny)
 ]
 reflection_depth = 3
 
