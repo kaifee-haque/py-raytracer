@@ -23,8 +23,8 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
     pixel = np.array([x, y, screen])
     origin = camera.position
     direction = unit(pixel - origin)
-
     color = np.zeros((3))
+
     reflection_weight = 1
 
     for k in range(reflection_depth):
@@ -35,6 +35,7 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
         intersection = origin + minimum_distance * direction
         surface_normal = nearest_object.normal(intersection)
         corrected_point = intersection + 0.00001 * surface_normal
+
         point_to_light = unit(light.position - corrected_point)
 
         _, minimum_distance = nearest_intersection(objects, corrected_point, point_to_light)
