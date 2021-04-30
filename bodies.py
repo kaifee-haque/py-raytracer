@@ -42,10 +42,11 @@ class Plane(Body):
         return np.array([0, 1, 0])
     
     def intersection(self, origin, direction):
-        dot_product = abs(np.dot( direction, np.array([0, 1, 0]) ))
+        dot_product = abs(np.dot( direction, self.normal(None) ))
         if dot_product != 0:
-            print(origin + (self.height - origin[1]) / direction[1] * direction)
-            return (self.height - origin[1]) / direction[1]
+            t = (self.height - origin[1]) / direction[1]
+            if t > 0:
+                return t
 
 class Sphere(Body):
     def __init__(self, position, radius, color, material):
