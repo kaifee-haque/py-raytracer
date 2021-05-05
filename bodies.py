@@ -27,9 +27,9 @@ class Light(Body):
         self.specular = np.array(color.specular)
 
 class Plane(Body):
-    def __init__(self, position, color, material):
+    def __init__(self, position, distance, color, material):
         super().__init__(position)
-        self.height = self.position[1]
+        self.distance = distance
 
         self.ambient = np.array(color.ambient)
         self.diffuse = np.array(color.diffuse)
@@ -39,14 +39,15 @@ class Plane(Body):
         self.reflectivity = material.reflectivity
 
     def normal(self, point):
-        return np.array([0, 1, 0])
+        return unit(self.position)
     
     def intersection(self, origin, direction):
-        dot_product = abs(np.dot( direction, self.normal(None) ))
-        if dot_product != 0:
-            t = (self.height - origin[1]) / direction[1]
-            if t > 0:
-                return t
+        p = self.position
+        num = self.distance - p[0] * origin[0] - p[1] * origin[1] - p[2] * origin[2]
+        denom = p[0] * direction[0] + p[1] * direction[1] + p[2] * direction[2]
+        t = num / denom
+        if t > 0:
+            return t
 
 class Sphere(Body):
     def __init__(self, position, radius, color, material):

@@ -4,7 +4,7 @@ from raytracer import *
 from matplotlib.pyplot import imsave
 
 # screen setup
-width, height = 1920, 1080
+width, height = 192, 108
 aspect_ratio = width / height
 screen = {
     "left": -1,
@@ -28,7 +28,8 @@ objects = [
     Sphere((0, 0.01, -1), 0.75, cyan, shiny),
     Sphere((0.3, 0.01, 0.35), 0.2, green, shiny),
     Sphere((-0.1, 0.03, 0.45), 0.07, white, matte),
-    Plane((0.3, -1, -0.2), grey, shiny)
+    Plane((0, 1, 0), -1, grey, shiny),
+    Plane((1, 3, 2), -10, soft_white, matte)
 ]
 
 image = np.zeros((height, width, 3))
