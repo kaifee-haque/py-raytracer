@@ -20,8 +20,8 @@ reflection_depth = 3
 
 camera = Body([0, 0, screen["z"] + focal_length])
 lights = [
-    Light((-4, 10, 3), white),
-    Light((4, 2, 3), white),
+    Light((-4, 10, 3), white, 0.5),
+    Light((4, 2, 3), white, 0.5),
 ]
 objects = [
     Sphere((-0.5, 0.1, 0.5), 0.17, purple, shiny),

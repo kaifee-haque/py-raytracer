@@ -20,11 +20,12 @@ class Material:
         self.reflectivity = reflectivity
 
 class Light(Body):
-    def __init__(self, position, color):
+    def __init__(self, position, color, intensity=1.0):
         super().__init__(position)
-        self.ambient = np.array(color.ambient)
-        self.diffuse = np.array(color.diffuse)
-        self.specular = np.array(color.specular)
+        self.intensity = intensity
+        self.ambient = np.array(color.ambient) * intensity
+        self.diffuse = np.array(color.diffuse) * intensity
+        self.specular = np.array(color.specular) * intensity
 
 class Plane(Body):
     def __init__(self, position, distance, color, material):
