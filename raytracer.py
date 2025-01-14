@@ -1,7 +1,7 @@
 import numpy as np
 
 ALPHA_AIR = 0.00001
-ATTENUATION_DISTANCE_SCALING = 15
+ATTENUATION_DISTANCE_SCALING = 25
 
 # computes a vector with length 1 in the direction of v
 def unit(v):

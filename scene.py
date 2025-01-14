@@ -4,7 +4,7 @@ from raytracer import *
 from matplotlib.pyplot import imsave
 
 # screen setup
-width, height = 1920, 1080
+width, height = 192, 108
 aspect_ratio = width / height
 screen = {
     "left": -1,
@@ -28,9 +28,12 @@ objects = [
     Sphere((0, 0.01, -1), 0.75, cyan, shiny),
     Sphere((0.3, 0.01, 0.35), 0.2, green, shiny),
     Sphere((-0.1, 0.03, 0.45), 0.07, white, matte),
-    Plane((0, 1, 0), -1, grey, shiny),
-    Plane((1, 3, 2), -10, soft_white, matte)
+    Plane((0, 1, 0), -1, grey, matte),
+    Plane((1, 3, 2), -10, orange, matte)
 ]
+
+def reinhard_tone_mapping(color):
+    return color / (1 + color)
 
 image = np.zeros((height, width, 3))
 
@@ -39,7 +42,7 @@ for i, y in enumerate(np.linspace(screen["top"], screen["bottom"], height)):
         color = np.zeros((3))
         for light in lights:
             color += raytrace(x, y, camera, screen["z"], reflection_depth, objects, light)
-        image[i, j] = np.clip(color, 0, 1)
+        image[i, j] = reinhard_tone_mapping(color)
 
     print(f"Progress: {round(i * 100 / height)}%")
 
