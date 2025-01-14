@@ -1,5 +1,8 @@
 import numpy as np
 
+ALPHA_AIR = 0.00001
+ATTENUATION_DISTANCE_SCALING = 15
+
 # computes a vector with length 1 in the direction of v
 def unit(v):
     return v / np.linalg.norm(v)
@@ -45,6 +48,10 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
         if light_blocked:
             break
 
+        scaled_light_distance = point_to_light_distance / ATTENUATION_DISTANCE_SCALING
+
+        attenuation = np.exp(-ALPHA_AIR * scaled_light_distance) / (4 * np.pi * scaled_light_distance**2)
+
         partial_color = np.zeros((3))
 
         partial_color += nearest_object.ambient * light.ambient
@@ -55,7 +62,7 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
         half_angle_vector = unit(point_to_light + intersection_to_camera)
         partial_color += nearest_object.specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
 
-        color += reflection_weight * partial_color
+        color += reflection_weight * partial_color * attenuation
         reflection_weight *= nearest_object.reflectivity
 
         origin = corrected_point

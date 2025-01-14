@@ -4,7 +4,7 @@ from raytracer import *
 from matplotlib.pyplot import imsave
 
 # screen setup
-width, height = 192, 108
+width, height = 1920, 1080
 aspect_ratio = width / height
 screen = {
     "left": -1,
@@ -20,8 +20,8 @@ reflection_depth = 3
 
 camera = Body([0, 0, screen["z"] + focal_length])
 lights = [
-    Light((-4, 10, 3), white, 0.5),
-    Light((4, 2, 3), white, 0.5),
+    Light((-4, 10, 3), white, 1),
+    Light((4, 2, 3), white, 1),
 ]
 objects = [
     Sphere((-0.5, 0.1, 0.5), 0.17, purple, shiny),
@@ -39,7 +39,6 @@ for i, y in enumerate(np.linspace(screen["top"], screen["bottom"], height)):
         color = np.zeros((3))
         for light in lights:
             color += raytrace(x, y, camera, screen["z"], reflection_depth, objects, light)
-        color = color / len(lights)
         image[i, j] = np.clip(color, 0, 1)
 
     print(f"Progress: {round(i * 100 / height)}%")
