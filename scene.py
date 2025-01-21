@@ -1,35 +1,51 @@
+import yaml
+from config_helpers import *
 from bodies import *
-from materials import *
 from raytracer import *
 from matplotlib.pyplot import imsave
 
+def load_yaml(file_path):
+    with open(file_path, 'r') as f:
+        return yaml.safe_load(f)
+
+config = load_yaml('scene_config.yaml')
+materials = load_yaml('materials.yaml')
+
 # screen setup
-width, height = 192, 108
+width = config['screen']['width']
+height = config['screen']['height']
+
 aspect_ratio = width / height
 screen = {
     "left": -1,
     "top": 1 / aspect_ratio,
     "right": 1,
     "bottom": -1 / aspect_ratio,
-    "z": 1.25
+    "z": config['screen']['z']
 }
 
 # scene setup
-reflection_depth = 3
+reflection_depth = config['reflection_depth']
 
-camera = Body([0, 0, screen["z"]])
+camera = Body(config['camera']['position'])
+
 lights = [
-    Light((-4, 10, 3), white, 1),
-    Light((4, 2, 3), white, 1),
+    Light(
+        position=light['position'],
+        color=resolve_color(light['color']),
+        intensity=light['intensity']
+    )
+    for light in config['lights']
 ]
-objects = [
-    Sphere((-0.5, 0.1, 0.5), 0.17, purple, shiny),
-    Sphere((0, 0.01, -1), 0.75, cyan, shiny),
-    Sphere((0.3, 0.01, 0.35), 0.2, green, shiny),
-    Sphere((-0.1, 0.03, 0.45), 0.07, white, matte),
-    Plane((0, 1, 0), -1, grey, matte),
-    Plane((1, 3, 2), -10, orange, matte)
-]
+
+objects = []
+for obj in config['objects']:
+    color = resolve_color(obj['color'])
+    material = resolve_material(obj['material'])
+    if obj['type'] == 'Sphere':
+        objects.append(Sphere(obj['position'], obj['radius'], color, material))
+    elif obj['type'] == 'Plane':
+        objects.append(Plane(obj['position'], obj['distance'], color, material))
 
 def reinhard_tone_mapping(color):
     return color / (1 + color)

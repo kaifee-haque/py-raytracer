@@ -1,0 +1,11 @@
+colors:
+  green: {ambient: [0, 25, 0], diffuse: [0, 18, 0], specular: [255, 255, 255]}
+  grey: {ambient: [25, 25, 25], diffuse: [128, 128, 128], specular: [255, 255, 255]}
+  purple: {ambient: [18, 0, 25], diffuse: [18, 0, 255], specular: [255, 255, 255]}
+  white: {ambient: [255, 255, 255], diffuse: [255, 255, 255], specular: [255, 255, 255]}
+  cyan: {ambient: [0, 255, 255], diffuse: [0, 25, 25], specular: [255, 255, 255]}
+  orange: {ambient: [255, 102, 70], diffuse: [255, 10, 7], specular: [255, 255, 255]}
+
+materials:
+  shiny: {luster: 100, reflectivity: 75}
+  matte: {luster: 50, reflectivity: 0.2}
