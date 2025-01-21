@@ -8,6 +8,8 @@ To-do:
 🔳 More shapes<br />
 ✅Orientable planes<br />
 🔳 Refraction/translucence<br />
+🔳 Glowing objects<br />
 ✅ JSON file for objects and lights<br />
-🔳 Soft shadows<br />
+🔳 2D cross-sectional scene previews
+🔳 Soft shadows (possible bug)<br />
 🔳 Easier way to position the camera<br />
