@@ -8,6 +8,6 @@ To-do:
 🔳 More shapes<br />
 ✅Orientable planes<br />
 🔳 Refraction/translucence<br />
-🔳 JSON file for objects and lights<br />
+✅ JSON file for objects and lights<br />
 🔳 Soft shadows<br />
 🔳 Easier way to position the camera<br />

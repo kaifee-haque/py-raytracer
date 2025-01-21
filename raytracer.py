@@ -54,13 +54,15 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
 
         partial_color = np.zeros((3))
 
-        partial_color += nearest_object.ambient * light.ambient
+        nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
 
-        partial_color += nearest_object.diffuse * light.diffuse * np.dot(point_to_light, surface_normal)
+        partial_color += nearest_obj_ambient * light.ambient
+
+        partial_color += nearest_obj_diffuse * light.diffuse * np.dot(point_to_light, surface_normal)
 
         intersection_to_camera = unit(camera.position - intersection)
         half_angle_vector = unit(point_to_light + intersection_to_camera)
-        partial_color += nearest_object.specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
+        partial_color += nearest_obj_specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
 
         color += reflection_weight * partial_color * attenuation
         reflection_weight *= nearest_object.reflectivity

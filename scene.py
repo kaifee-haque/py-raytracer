@@ -45,7 +45,19 @@ for obj in config['objects']:
     if obj['type'] == 'Sphere':
         objects.append(Sphere(obj['position'], obj['radius'], color, material))
     elif obj['type'] == 'Plane':
-        objects.append(Plane(obj['position'], obj['distance'], color, material))
+        # look for checkerboard settings, defaulting to false/5 if not provided
+        checkerboard = obj.get('checkerboard', False)
+        checker_scale = obj.get('checker_scale', 5)
+        objects.append(
+            Plane(
+                position=obj['position'],
+                distance=obj['distance'],
+                color=color,
+                material=material,
+                checkerboard=checkerboard,
+                checker_scale=checker_scale
+            )
+        )
 
 def reinhard_tone_mapping(color):
     return color / (1 + color)
