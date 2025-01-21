@@ -15,10 +15,9 @@ screen = {
 }
 
 # scene setup
-focal_length = 1
 reflection_depth = 3
 
-camera = Body([0, 0, screen["z"] + focal_length])
+camera = Body([0, 0, screen["z"]])
 lights = [
     Light((-4, 10, 3), white, 1),
     Light((4, 2, 3), white, 1),
