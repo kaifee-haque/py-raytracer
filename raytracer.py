@@ -34,6 +34,15 @@ def nearest_intersection(objects, origin, direction):
 
     return nearest_object, minimum_distance
 
+def compute_attenuation(light_distance):
+    """
+    Light decreases in power according to:
+      - the square inverse law
+      - scattering due to the medium (usually air).
+    """
+    scaled_light_distance = light_distance / ATTENUATION_DISTANCE_SCALING
+    return np.exp(-ALPHA_AIR * scaled_light_distance) / (4 * np.pi * scaled_light_distance**2)
+
 def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
     """
     Casts a ray from the camera through a given pixel, bouncing a
@@ -64,12 +73,6 @@ def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
                 # light is blocked - skip its contribution in the current bounce
                 continue
 
-            # light decreases in power according to:
-            #   - the square inverse law
-            #   - scattering due to the medium (usually air)
-            scaled_light_distance = intersection_to_light_distance / ATTENUATION_DISTANCE_SCALING
-            attenuation = np.exp(-ALPHA_AIR * scaled_light_distance) / (4 * np.pi * scaled_light_distance**2)
-
             # add color components
             nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
 
@@ -82,6 +85,7 @@ def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
             half_angle_vector = unit(intersection_to_light + intersection_to_camera)
             partial_color += nearest_obj_specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
 
+            attenuation = compute_attenuation(intersection_to_light_distance)
             color += reflection_weight * partial_color * attenuation
 
         reflection_weight *= nearest_object.reflectivity
