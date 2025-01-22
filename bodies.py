@@ -120,7 +120,7 @@ class Plane(Body):
         ray equation for x and then solve for t.
             - if t is non-zero, the ray intersects the plane!
             - if t is negative, the intersection point is behind the ray's origin. 
-            - if t is zero, the origin intersects the plane.
+            - if t is zero, the ray's origin intersects the plane.
             - if the denominator is zero, the ray is parallel to the plane.
         """
         p = self.position

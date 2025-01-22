@@ -3,31 +3,46 @@ import numpy as np
 ALPHA_AIR = 0.00001
 ATTENUATION_DISTANCE_SCALING = 25
 
-# computes a vector with length 1 in the direction of v
 def unit(v):
+    """
+    Computes a vector with length 1 in the direction of v.
+    """
     return v / np.linalg.norm(v)
 
-# computes the reflection of v across the surface perpendicular to n
 def reflected(v, n):
+    """
+    Computes the reflection of v across the surface perpendicular to n
+    """
     return v - 2 * np.dot(v, n) * n
 
-# returns the nearest object hit by the ray and its distance from the camera
 def nearest_intersection(objects, origin, direction):
+    """
+    Returns the nearest object hit by the ray, and its distance from the
+    ray's origin
+    """
+    # get the distances from the ray's origin to each object
     distances = [o.intersection(origin, direction) for o in objects]
+
     minimum_distance = 1_000_000
     nearest_object = None
+
     for i, distance in enumerate(distances):
         if distance and distance < minimum_distance:
             minimum_distance = distance
             nearest_object = objects[i]
+
     return nearest_object, minimum_distance
 
 def raytrace(x, y, camera, screen, reflection_depth, objects, light):
+    """
+    Casts a ray from the camera through a given pixel, bouncing a
+    predefined number of times.
+    """
+    #setup
     pixel = np.array([x, y, screen])
     origin = camera.position
     direction = unit(pixel - origin)
     color = np.zeros((3))
-
     reflection_weight = 1
 
     for k in range(reflection_depth):

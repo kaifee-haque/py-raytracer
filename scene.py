@@ -26,9 +26,7 @@ screen = {
 
 # scene setup
 reflection_depth = config['reflection_depth']
-
 camera = Body(config['camera']['position'])
-
 lights = [
     Light(
         position=light['position'],
