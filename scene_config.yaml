@@ -1,6 +1,6 @@
 screen:
-  width: 1920
-  height: 1080
+  width: 500
+  height: 500
   z: 1.25
 
 camera:

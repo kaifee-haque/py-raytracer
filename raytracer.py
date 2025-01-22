@@ -45,6 +45,7 @@ def raytrace(x, y, camera, screen, reflection_depth, objects, light):
         point_to_light_distance = np.linalg.norm(light.position - intersection)
         light_blocked = minimum_distance < point_to_light_distance
 
+        # TODO: look into this. it may be the reason for the "sharp shadow" bug
         if light_blocked:
             break
 
