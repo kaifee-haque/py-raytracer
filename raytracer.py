@@ -18,12 +18,13 @@ def reflected(v, n):
 def nearest_intersection(objects, origin, direction):
     """
     Returns the nearest object hit by the ray, and its distance from the
-    ray's origin
+    ray's origin.
+    If there are no intersections, we return (None, +infinity)
     """
     # get the distances from the ray's origin to each object
     distances = [o.intersection(origin, direction) for o in objects]
 
-    minimum_distance = 1_000_000
+    minimum_distance = float("inf")
     nearest_object = None
 
     for i, distance in enumerate(distances):
@@ -33,56 +34,58 @@ def nearest_intersection(objects, origin, direction):
 
     return nearest_object, minimum_distance
 
-def raytrace(x, y, camera, screen, reflection_depth, objects, light):
+def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
     """
     Casts a ray from the camera through a given pixel, bouncing a
-    predefined number of times.
+    predefined number of times, considering all lights in the scene.
     """
-    #setup
-    pixel = np.array([x, y, screen])
-    origin = camera.position
-    direction = unit(pixel - origin)
     color = np.zeros((3))
     reflection_weight = 1
 
     for k in range(reflection_depth):
         nearest_object, minimum_distance = nearest_intersection(objects, origin, direction)
-        if nearest_object is None:
+        if nearest_object is None: # TODO: add support for background colors
             break
 
         intersection = origin + minimum_distance * direction
         surface_normal = nearest_object.normal(intersection)
+        # offset just above the surface so we don't end up with shadow acne
         corrected_point = intersection + 0.00001 * surface_normal
-
-        point_to_light = unit(light.position - corrected_point)
-
-        _, minimum_distance = nearest_intersection(objects, corrected_point, point_to_light)
-        point_to_light_distance = np.linalg.norm(light.position - intersection)
-        light_blocked = minimum_distance < point_to_light_distance
-
-        # TODO: look into this. it may be the reason for the "sharp shadow" bug
-        if light_blocked:
-            break
-
-        scaled_light_distance = point_to_light_distance / ATTENUATION_DISTANCE_SCALING
-
-        attenuation = np.exp(-ALPHA_AIR * scaled_light_distance) / (4 * np.pi * scaled_light_distance**2)
 
         partial_color = np.zeros((3))
 
-        nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
+        for light in lights:
+            intersection_to_light = unit(light.position - corrected_point)
+            intersection_to_light_distance = np.linalg.norm(light.position - intersection)
 
-        partial_color += nearest_obj_ambient * light.ambient
+            # shadow check
+            _obstruction_obj, obstruction_distance = nearest_intersection(objects, corrected_point, intersection_to_light)
+            if obstruction_distance < intersection_to_light_distance:
+                # light is blocked - skip its contribution in the current bounce
+                continue
 
-        partial_color += nearest_obj_diffuse * light.diffuse * np.dot(point_to_light, surface_normal)
+            # light decreases in power according to:
+            #   - the square inverse law
+            #   - scattering due to the medium (usually air)
+            scaled_light_distance = intersection_to_light_distance / ATTENUATION_DISTANCE_SCALING
+            attenuation = np.exp(-ALPHA_AIR * scaled_light_distance) / (4 * np.pi * scaled_light_distance**2)
 
-        intersection_to_camera = unit(camera.position - intersection)
-        half_angle_vector = unit(point_to_light + intersection_to_camera)
-        partial_color += nearest_obj_specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
+            # add color components
+            nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
 
-        color += reflection_weight * partial_color * attenuation
+            partial_color += nearest_obj_ambient * light.ambient
+            # diffuse depends on angle between light source and object
+            partial_color += nearest_obj_diffuse * light.diffuse * np.dot(intersection_to_light, surface_normal)
+
+            # ambient depends on half-angle between camera and light source
+            intersection_to_camera = unit(camera.position - intersection)
+            half_angle_vector = unit(intersection_to_light + intersection_to_camera)
+            partial_color += nearest_obj_specular * light.specular * np.dot(surface_normal, half_angle_vector) ** (nearest_object.luster)
+
+            color += reflection_weight * partial_color * attenuation
+
         reflection_weight *= nearest_object.reflectivity
-
         origin = corrected_point
         direction = reflected(direction, surface_normal)
+
     return color

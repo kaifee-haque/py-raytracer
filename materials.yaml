@@ -7,5 +7,5 @@ colors:
   orange: {ambient: [255, 102, 70], diffuse: [255, 10, 7], specular: [255, 255, 255]}
 
 materials:
-  shiny: {luster: 100, reflectivity: 75}
+  shiny: {luster: 100, reflectivity: 0.75}
   matte: {luster: 50, reflectivity: 0.2}

@@ -8,6 +8,10 @@ def load_yaml(file_path):
     with open(file_path, 'r') as f:
         return yaml.safe_load(f)
 
+def compute_ray_direction(x, y, camera):
+    pixel = np.array([x, y, screen["z"]])
+    return unit(pixel - camera.position)
+
 config = load_yaml('scene_config.yaml')
 materials = load_yaml('materials.yaml')
 
@@ -64,9 +68,15 @@ image = np.zeros((height, width, 3))
 
 for i, y in enumerate(np.linspace(screen["top"], screen["bottom"], height)):
     for j, x in enumerate(np.linspace(screen["left"], screen["right"], width)):
-        color = np.zeros((3))
-        for light in lights:
-            color += raytrace(x, y, camera, screen["z"], reflection_depth, objects, light)
+        ray_direction = compute_ray_direction(x, y, camera)
+        color = trace_ray(
+            origin=camera.position,
+            direction=ray_direction,
+            reflection_depth=reflection_depth,
+            objects=objects,
+            lights=lights,
+            camera=camera
+        )
         image[i, j] = reinhard_tone_mapping(color)
 
     print(f"Progress: {round((i + 1) * 100 / height)}%")
