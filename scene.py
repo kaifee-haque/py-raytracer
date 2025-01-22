@@ -69,6 +69,6 @@ for i, y in enumerate(np.linspace(screen["top"], screen["bottom"], height)):
             color += raytrace(x, y, camera, screen["z"], reflection_depth, objects, light)
         image[i, j] = reinhard_tone_mapping(color)
 
-    print(f"Progress: {round(i * 100 / height)}%")
+    print(f"Progress: {round((i + 1) * 100 / height)}%")
 
 imsave('output/scene.png', image)
