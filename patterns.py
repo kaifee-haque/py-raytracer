@@ -1,6 +1,5 @@
 import numpy as np
 from abc import ABC, abstractmethod
-from bodies import unit
 
 class Pattern(ABC):
     """
@@ -10,7 +9,7 @@ class Pattern(ABC):
     def get_color_at(self, shape, point):
         pass
 
-class CheckerboardPattern(Pattern):
+class Checkerboard(Pattern):
     def __init__(self, scale=5):
         self.scale = scale
 
@@ -18,6 +17,7 @@ class CheckerboardPattern(Pattern):
         """
         Implements checkerboard logic, but defers UV-mapping to shape. 
             - shape.uv_map(point) returns (u, v) in some 2D coordinate system.
+            TODO: incorporate the default color
         """
         (u, v) = shape.uv_map(point, self.scale)
 

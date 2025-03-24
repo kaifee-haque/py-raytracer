@@ -1,4 +1,5 @@
 import yaml
+import patterns
 from config_helpers import *
 from bodies import *
 from raytracer import *
@@ -44,20 +45,24 @@ objects = []
 for obj in config['objects']:
     color = resolve_color(obj['color'])
     material = resolve_material(obj['material'])
+
+    pattern = None
+    if 'pattern' in obj:
+        if obj['pattern']['type'] == 'checkerboard':
+            scale = obj['pattern'].get('scale', 5)
+            pattern = patterns.Checkerboard(scale=scale)
+
     if obj['type'] == 'Sphere':
-        objects.append(Sphere(obj['position'], obj['radius'], color, material))
+        objects.append(Sphere(obj['position'], obj['radius'], color, material, pattern))
+
     elif obj['type'] == 'Plane':
-        # look for checkerboard settings, defaulting to false/5 if not provided
-        checkerboard = obj.get('checkerboard', False)
-        checker_scale = obj.get('checker_scale', 5)
         objects.append(
             Plane(
                 position=obj['position'],
                 distance=obj['distance'],
                 color=color,
                 material=material,
-                checkerboard=checkerboard,
-                checker_scale=checker_scale
+                pattern=pattern
             )
         )
 

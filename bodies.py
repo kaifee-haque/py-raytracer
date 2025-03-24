@@ -58,7 +58,7 @@ class Plane(Body):
     Planes can optionally implement a checkerboard pattern.
     """
     def __init__(self, position, distance, color, material,
-                 checkerboard=False, checker_scale=5):
+                 pattern=None):
         super().__init__(position)
         self.distance = distance
 
@@ -69,12 +69,23 @@ class Plane(Body):
         self.luster = material.luster
         self.reflectivity = material.reflectivity
 
-        # checkerboard setup
-        self.checkerboard = checkerboard
-        self.checker_scale = checker_scale
-        if self.checkerboard:
-            self._init_axes()
+        self.pattern = pattern  # pattern can be any Pattern subclass or None
+        
+        self._init_axes()
 
+    def uv_map(self, point, scale=5):
+        """
+        Computes (u, v) coordinates for the plane, scaled by a given value.
+        """
+        normal = unit(self.position)
+        # correct for the offset introduced in raytracer.py
+        #  to avoid shadow acne
+        offset = np.dot(point, normal) - self.distance
+        point_on_plane = point - offset * normal
+
+        u = np.dot(point_on_plane, self.u_axis) * scale
+        v = np.dot(point_on_plane, self.v_axis) * scale
+        return (u, v)
     
     def _init_axes(self):
         """
@@ -133,35 +144,12 @@ class Plane(Body):
     def get_color_at(self, point):
         """
         Returns (ambient, diffuse, specular) at a given intersection point.
-            - if checkerboard is false, returns the plane's default color
-            - othewise, returns black or white squares
-        TODO: Add support for custom colors
+            - if a pattern is assigned, we override the color
         """
-        if not self.checkerboard:
-            return (self.ambient, self.diffuse, self.specular)
-
-        normal = self.normal()
-        offset = np.dot(point, normal) - self.distance
-        # correct for the offset introduced in raytracer.py
-        #  to avoid shadow acne
-        point_on_plane = point - offset * normal
-
-        # get the coordinates of the point on the u-v basis
-        u = np.dot(point_on_plane, self.u_axis) * self.checker_scale
-        v = np.dot(point_on_plane, self.v_axis) * self.checker_scale
-
-        # alternate colors based on whether the sum of the
-        #  coordinates is even/odd
-        if int(np.floor(u) + np.floor(v)) % 2 == 0:
-            # white square
-            return (np.array([1.0, 1.0, 1.0]),
-                    np.array([1.0, 1.0, 1.0]),
-                    np.array([1.0, 1.0, 1.0]))
+        if self.pattern:
+            return self.pattern.get_color_at(self, point)
         else:
-            # black square
-            return (np.array([0.0, 0.0, 0.0]),
-                    np.array([0.0, 0.0, 0.0]),
-                    np.array([1.0, 1.0, 1.0]))
+            return (self.ambient, self.diffuse, self.specular)
 
 class Sphere(Body):
     """
@@ -169,7 +157,7 @@ class Sphere(Body):
         - the coordinates of its center point
         - its radius
     """
-    def __init__(self, position, radius, color, material):
+    def __init__(self, position, radius, color, material, pattern=None):
         super().__init__(position)
         self.radius = radius
 
@@ -179,6 +167,24 @@ class Sphere(Body):
 
         self.luster = material.luster
         self.reflectivity = material.reflectivity
+
+        self.pattern = pattern
+
+    def uv_map(self, point, scale=5):
+        """
+        Computes (u, v) spherical coordinates for the sphere, scaled by a given value.
+        TODO: More advanced mappings might be needed for other patterns
+        """
+        # vector from center to the intersection point
+        local_point = point - self.position
+        # convert to spherical angles
+        theta = np.arccos(local_point[1] / self.radius)  # polar angle
+        phi = np.arctan2(local_point[2], local_point[0])  # azimuth angle
+
+        # convert angles to [0..1] range and then scale
+        u = (phi + np.pi) / (2 * np.pi) * scale
+        v = (theta) / np.pi * scale
+        return u, v
 
     def normal(self, point):
         """
@@ -216,7 +222,10 @@ class Sphere(Body):
 
     def get_color_at(self, point):
         """
-        Returns (ambient, diffuse, specular) at a given intersection point
-        TODO: add support for textures.
+        Returns (ambient, diffuse, specular) at a given intersection point.
+            - if a pattern is assigned, we override the color
         """
-        return (self.ambient, self.diffuse, self.specular)
+        if self.pattern:
+            return self.pattern.get_color_at(self, point)
+        else:
+            return (self.ambient, self.diffuse, self.specular)
