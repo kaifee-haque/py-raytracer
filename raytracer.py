@@ -57,11 +57,16 @@ def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
             break
 
         intersection = origin + minimum_distance * direction
+        intersection_to_camera = unit(camera.position - intersection)
+
         surface_normal = nearest_object.normal(intersection)
         # offset just above the surface so we don't end up with shadow acne
         corrected_point = intersection + 0.00001 * surface_normal
 
         partial_color = np.zeros((3))
+
+        # ambient color of nearest object
+        nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
 
         for light in lights:
             intersection_to_light = unit(light.position - corrected_point)
@@ -74,8 +79,6 @@ def trace_ray(origin, direction, reflection_depth, objects, lights, camera):
                 continue
 
             # add color components
-            nearest_obj_ambient, nearest_obj_diffuse, nearest_obj_specular = nearest_object.get_color_at(intersection)
-
             partial_color += nearest_obj_ambient * light.ambient
             # diffuse depends on angle between light source and object
             partial_color += nearest_obj_diffuse * light.diffuse * np.dot(intersection_to_light, surface_normal)
